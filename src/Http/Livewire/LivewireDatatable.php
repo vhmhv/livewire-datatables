@@ -357,7 +357,7 @@ class LivewireDatatable extends Component
     public function getSortString()
     {
         $column = $this->freshColumns[$this->sort];
-        $dbTable = env('DB_CONNECTION');
+        $driver = $this->builder()->getModel()->getConnection()->getConfig('driver');
 
         switch (true) {
             case $column['sort']:
@@ -377,7 +377,7 @@ class LivewireDatatable extends Component
                 break;
 
              default:
-                return $dbTable == 'pgsql'
+                return $driver == 'pgsql'
                 ? new Expression('"'.$column['name'].'"')
                 : new Expression('`'.$column['name'].'`');
                 break;
@@ -717,10 +717,10 @@ class LivewireDatatable extends Component
                             foreach ($this->getColumnField($i) as $column) {
                                 $query->when(is_array($column), function ($query) use ($search, $column) {
                                     foreach ($column as $col) {
-                                        $query->orWhereRaw('LOWER('.$col.') like ?', "%$search%");
+                                        $query->orWhereRaw('LOWER('.$col.') like LOWER(?)', "%$search%");
                                     }
                                 }, function ($query) use ($search, $column) {
-                                    $query->orWhereRaw('LOWER('.$column.') like ?', "%$search%");
+                                    $query->orWhereRaw('LOWER('.$column.') like LOWER(?)', "%$search%");
                                 });
                             }
                         });
