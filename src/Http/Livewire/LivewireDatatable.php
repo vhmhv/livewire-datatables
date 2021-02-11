@@ -175,10 +175,11 @@ class LivewireDatatable extends Component
         ];
     }
 
-    public function getSelectStatements($withAlias = false)
+    public function getSelectStatements($withAlias = false, $export = false)
     {
-        return $this->processedColumns->columns->reject(function ($column) {
-            return $column->scope;
+        return $this->processedColumns->columns
+        ->reject(function ($column) use ($export) {
+            return $column->scope || ($export && $column->preventExport);
         })->map(function ($column) {
             if ($column->select) {
                 return $column;
@@ -687,10 +688,16 @@ class LivewireDatatable extends Component
             : 'count';
     }
 
-    public function buildDatabaseQuery()
+    public function buildDatabaseQuery($export = false)
     {
         $this->query = $this->builder();
-        $this->query->addSelect($this->getSelectStatements(true)->filter()->flatten()->toArray());
+
+        $this->query->addSelect(
+            $this->getSelectStatements(true, $export)
+            ->filter()
+            ->flatten()
+            ->toArray()
+        );
 
         $this->addGlobalSearch()
             ->addScopeColumns()
@@ -728,6 +735,8 @@ class LivewireDatatable extends Component
                 });
             }
         });
+
+        $this->page = 1;
 
         return $this;
     }
@@ -1005,12 +1014,12 @@ class LivewireDatatable extends Component
     {
         $this->forgetComputed();
 
-        return Excel::download(new DatatableExport($this->getQuery()->get()), 'DatatableExport.xlsx');
+        return Excel::download(new DatatableExport($this->getQuery(true)->get()), 'DatatableExport.xlsx');
     }
 
-    public function getQuery()
+    public function getQuery($export = false)
     {
-        $this->buildDatabaseQuery();
+        $this->buildDatabaseQuery($export);
 
         return $this->query->toBase();
     }
