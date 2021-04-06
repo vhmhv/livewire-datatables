@@ -168,7 +168,7 @@ class LivewireDatatablesServiceProvider extends ServiceProvider
                 is_array($this->app->config['view']['paths'])
             ) {
                 foreach ($this->app->config['view']['paths'] as $viewPath) {
-                    if (is_dir($appPath = $viewPath.'/livewire/'.$namespace)) {
+                    if (is_dir($appPath = $viewPath.'/vendor/'.$namespace)) {
                         $view->addNamespace($namespace, $appPath);
                     }
                 }
