@@ -61,7 +61,7 @@ class Column
     {
         $column = new static;
 
-        $column->name = 'callback_'.crc32(json_encode(func_get_args()));
+        $column->name = 'callback_' . crc32(json_encode(func_get_args()));
         $column->callback = $callback;
         $column->additionalSelects = is_array($columns) ? $columns : array_map('trim', explode(',', $columns));
         $column->params = $params;
@@ -71,7 +71,7 @@ class Column
 
     public static function checkbox($attribute = 'id')
     {
-        return static::name($attribute.' as checkbox_attribute')->setType('checkbox');
+        return static::name($attribute . ' as checkbox_attribute')->setType('checkbox');
     }
 
     public static function scope($scope, $alias)
@@ -214,7 +214,7 @@ class Column
 
     public function toggleHidden()
     {
-        $this->hidden = ! $this->hidden;
+        $this->hidden = !$this->hidden;
     }
 
     public function toArray()
@@ -231,7 +231,7 @@ class Column
 
     public function isBaseColumn()
     {
-        return ! Str::contains($this->name, '.') && ! $this->raw;
+        return !Str::contains($this->name, '.') && !$this->raw;
     }
 
     public function field()
@@ -252,6 +252,13 @@ class Column
     public function setType($type)
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    public function addParams($params)
+    {
+        $this->params = $params;
 
         return $this;
     }
